@@ -1,4 +1,6 @@
 [report]
+include =
+    */modulbank/*
 omit =
     modulbank/version.py
 exclude_lines =

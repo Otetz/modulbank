@@ -2,17 +2,17 @@
 modulbank
 =========
 
-.. image:: https://travis-ci.org/otetz/modulbank.svg?branch=master
-    :target: https://travis-ci.org/otetz/modulbank
+.. image:: https://travis-ci.org/Otetz/modulbank.svg?branch=master
+    :target: https://travis-ci.org/Otetz/modulbank
 .. image:: https://readthedocs.org/projects/modulbank/badge/?version=latest
     :target: http://modulbank.readthedocs.io/ru/latest/?badge=latest
     :alt: Documentation Status
 .. image:: https://badge.fury.io/py/modulbank.svg
     :target: https://badge.fury.io/py/modulbank
-.. image:: https://coveralls.io/repos/github/otetz/modulbank/badge.svg?branch=master
-    :target: https://coveralls.io/github/otetz/modulbank?branch=master
-.. image:: https://codeclimate.com/github/otetz/modulbank/badges/gpa.svg
-    :target: https://codeclimate.com/github/otetz/modulbank
+.. image:: https://coveralls.io/repos/github/Otetz/modulbank/badge.svg?branch=master
+    :target: https://coveralls.io/github/Otetz/modulbank?branch=master
+.. image:: https://codeclimate.com/github/Otetz/modulbank/badges/gpa.svg
+    :target: https://codeclimate.com/github/Otetz/modulbank
     :alt: Code Climate
 
 Python client for ModulBank REST API

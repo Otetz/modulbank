@@ -2,6 +2,9 @@ language: python
 cache:
   pip: true
   timeout: 900
+branches:
+  only:
+  - master
 python:
   - "3.4"
   - "3.5"
@@ -18,6 +21,6 @@ install:
 env:
   - MODULBANK_TOKEN=sandboxtoken
 # command to run tests
-script: py.test --cov=modulbank
+script: py.test --cov
 after_success:
   - coveralls

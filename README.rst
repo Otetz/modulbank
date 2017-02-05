@@ -5,7 +5,7 @@ modulbank
 .. image:: https://travis-ci.org/Otetz/modulbank.svg?branch=master
     :target: https://travis-ci.org/Otetz/modulbank
 .. image:: https://readthedocs.org/projects/modulbank/badge/?version=latest
-    :target: http://modulbank.readthedocs.io/ru/latest/?badge=latest
+    :target: http://modulbank.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 .. image:: https://badge.fury.io/py/modulbank.svg
     :target: https://badge.fury.io/py/modulbank

@@ -3,9 +3,6 @@ cache:
   pip: true
   timeout: 900
 python:
-  - "2.6"
-  - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
   - "3.5-dev" # 3.5 development branch
@@ -21,6 +18,6 @@ install:
 env:
   - MODULBANK_TOKEN=sandboxtoken
 # command to run tests
-script: py.test --cov
+script: py.test --cov=modulbank
 after_success:
   - coveralls

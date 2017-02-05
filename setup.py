@@ -24,7 +24,6 @@ setup(
     author_email="otetz@me.com",
     license='MIT',
     classifiers=[
-        "Development AccountStatus :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
         "Intended Audience :: Financial and Insurance Industry",
         "Intended Audience :: Information Technology",

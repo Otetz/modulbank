@@ -1,0 +1,76 @@
+[
+  {
+    "companyName": "ООО \"Ромашка\"",
+    "companyId": "70ca00f6-1f10-4964-aca6-a5ec032efe37",
+    "registrationCompleted": true,
+    "bankAccounts": [
+      {
+        "balance": 900000.0,
+        "bankInn": "2204000595",
+        "status": "New",
+        "beginDate": "2015-10-07T00:00:00",
+        "id": "edb10116-5a93-4963-a53b-a5ec037177f0",
+        "category": "CheckingAccount",
+        "bankBic": "044525092",
+        "bankName": "МОСКОВСКИЙ ФИЛИАЛ ОАО КБ\"РЕГИОНАЛЬНЫЙ КРЕДИТ\" Г.МОСКВА",
+        "bankCorrespondentAccount": "30101810000000000001",
+        "accountName": "Основной счет",
+        "currency": "RUR",
+        "bankKpp": "770443001",
+        "number": "40802810070000000001"
+      },
+      {
+        "balance": 100000.0,
+        "bankInn": "2204000595",
+        "status": "New",
+        "beginDate": "2016-02-07T00:00:00",
+        "id": "d33f114a-7624-457a-8f2f-a5ec03750446",
+        "category": "CardAccount",
+        "bankBic": "044525092",
+        "bankName": "МОСКОВСКИЙ ФИЛИАЛ ОАО КБ\"РЕГИОНАЛЬНЫЙ КРЕДИТ\" Г.МОСКВА",
+        "bankCorrespondentAccount": "30101810000000000002",
+        "accountName": "Карточный счет",
+        "currency": "RUR",
+        "bankKpp": "770443001",
+        "number": "40802810370000000002"
+      }
+    ]
+  },
+  {
+    "companyName": "ООО \"Василёк\"",
+    "companyId": "736d31a9-1755-401d-b278-a5ec037179b6",
+    "registrationCompleted": false,
+    "bankAccounts": [
+      {
+        "balance": 50000.0,
+        "bankInn": "2204000595",
+        "status": "New",
+        "beginDate": "2015-05-11T00:00:00",
+        "id": "58c20343-5d3b-422c-b98b-a5ec037df782",
+        "category": "CheckingAccount",
+        "bankBic": "044525092",
+        "bankName": "МОСКОВСКИЙ ФИЛИАЛ ОАО КБ\"РЕГИОНАЛЬНЫЙ КРЕДИТ\" Г.МОСКВА",
+        "bankCorrespondentAccount": "30101810000000000003",
+        "accountName": "Счет №1",
+        "currency": "EUR",
+        "bankKpp": "770443001",
+        "number": "40802810670000000003"
+      },
+      {
+        "balance": 1000.0,
+        "bankInn": "2204000595",
+        "status": "Closed",
+        "beginDate": "2015-09-07T00:00:00",
+        "id": "04fb0f74-1ce1-4014-bde4-a5ec0396b592",
+        "category": "DepositAccount",
+        "bankBic": "044525092",
+        "bankName": "МОСКОВСКИЙ ФИЛИАЛ ОАО КБ\"РЕГИОНАЛЬНЫЙ КРЕДИТ\" Г.МОСКВА",
+        "bankCorrespondentAccount": "30101810000000000004",
+        "accountName": "Депозит",
+        "currency": "RUR",
+        "bankKpp": "770443001",
+        "number": "40802810970000000004"
+      }
+    ]
+  }
+]

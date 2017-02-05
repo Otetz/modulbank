@@ -1,0 +1,4 @@
+# Include the license file
+include README.rst
+include *.txt
+recursive-include *.txt *.py

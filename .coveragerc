@@ -1,0 +1,8 @@
+[report]
+omit =
+    modulbank/version.py
+exclude_lines =
+    pragma: no cover
+    if 0:
+    if __name__ == .__main__.:
+    raise

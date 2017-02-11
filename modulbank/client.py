@@ -163,6 +163,16 @@ class ModulbankClient:
         return "<ModulbankClient token='…' sandbox_mode='{sandbox_mode}' page_size={page_size}>".format(
             sandbox_mode=self.__sandbox_mode, page_size=self.__page_size)
 
+    @property
+    def token(self) -> str:
+        """
+        Токен API
+
+        :return: Токен API
+        :rtype: str
+        """
+        return self.__token
+
     def accounts(self) -> list:
         """
         Получение информации о компаниях пользователя

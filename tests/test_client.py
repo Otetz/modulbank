@@ -219,3 +219,17 @@ def test_client_bank_exchange_str():
     exchange = ClientBankExchange()
     assert str(exchange).startswith('\nОбщиеСведения')
     assert exchange.document.startswith('1CClientBankExchange')
+
+
+def test_notify_request(client: ModulbankClient):
+    data = json_from_file('new_operations.json')
+    nr = NotifyRequest(data)
+    assert nr.inn == '1111111111'
+    assert nr.kpp == ''
+    assert nr.check_signature(client.token)
+
+
+def test_notify_request_str():
+    data = json_from_file('new_operations.json')
+    nr = NotifyRequest(data)
+    assert str(nr).startswith('<NotifyRequest ')

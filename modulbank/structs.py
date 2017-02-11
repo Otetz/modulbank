@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 from decimal import Decimal, InvalidOperation
 from enum import Enum
 
@@ -926,3 +927,78 @@ class PaymentOrder:
         :rtype: datetime.date
         """
         return self.__date
+
+
+class NotifyRequest:
+    """
+    Уведомление о произошедшей транзакции.
+    """
+
+    def __init__(self, obj: dict = None):
+        """
+        Конструктор
+
+        :param obj: JSON-объект уведомления о произошедшей транзакции из API МодульБанка.
+        """
+        self.__inn = 'companyInn' in obj and obj['companyInn'] or ''
+        self.__kpp = 'contragentKpp' in obj and obj['contragentKpp'] or ''
+        if 'operation' in obj:
+            self.__operation = Operation(obj['operation'])
+        if 'SHA1Hash' in obj:
+            self.__signature = obj['SHA1Hash']
+
+    def __str__(self):
+        return "<NotifyRequest inn={s.inn} kpp={s.kpp} operation:{s.operation} signature={s.signature}>".format(s=self)
+
+    @property
+    def inn(self) -> str:
+        """
+        ИНН компании (для которой в Модульбанке появилась транзакция)
+
+        :return: ИНН компании
+        :rtype: str
+        """
+        return self.__inn
+
+    @property
+    def kpp(self) -> str:
+        """
+        КПП компании (для которой в Модульбанке появилась транзакция)
+
+        :return: КПП компании
+        :rtype: str
+        """
+        return self.__kpp
+
+    @property
+    def operation(self) -> Operation:
+        """
+        Операция по счёту
+
+        :return: Операция по счёту
+        :rtype: Operation
+        """
+        return self.__operation
+
+    @property
+    def signature(self) -> str:
+        """
+        Подпись сообщения, гарантирующая целостность данных уведомления и то, что уведомления были отправлены сервером
+        Модульбанка. Проверяется с помощью :meth:`check_signature`
+
+        :return: Подпись сообщения
+        :rtype: str
+        """
+        return self.__signature
+
+    def check_signature(self, token) -> bool:
+        """
+        Проверка SHA1-подписи.
+
+        :param str token: Токен из ЛК МодульБанка
+        :return: Успешность проверки цифровой подписи
+        :rtype: bool
+        """
+        s = "{}&{}".format(token[:10], self.operation.operation_id)
+        digest = hashlib.sha1(s.encode()).hexdigest()
+        return digest.lower() == self.signature.lower()

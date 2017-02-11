@@ -39,6 +39,7 @@ class Company:
         Системный идентификатор компании
 
         :return: Системный идентификатор компании
+        :rtype: str
         """
         return self.__company_id
 
@@ -48,15 +49,17 @@ class Company:
         Название компании
 
         :return: Название компании
+        :rtype: str
         """
         return self.__name
 
     @property
-    def bank_accounts(self) -> []:
+    def bank_accounts(self) -> list:
         """
         Массив счетов компании
 
         :return: Массив счетов компании
+        :rtype: list(BankAccount)
         """
         return self.__bank_accounts
 
@@ -92,6 +95,7 @@ class Bank:
         БИК Банка
 
         :return: БИК Банка
+        :rtype: str
         """
         return self.__bic
 
@@ -101,6 +105,7 @@ class Bank:
         ИНН Банка
 
         :return: ИНН Банка
+        :rtype: str
         """
         return self.__inn
 
@@ -110,6 +115,7 @@ class Bank:
         КПП Банка
 
         :return: КПП Банка
+        :rtype: str
         """
         return self.__kpp
 
@@ -119,6 +125,7 @@ class Bank:
         Наименование банка
 
         :return: Наименование банка
+        :rtype: str
         """
         return self.__name
 
@@ -128,6 +135,7 @@ class Bank:
         Номер корреспондетского счёта
 
         :return: Корр. счёт
+        :rtype: str
         """
         return self.__corr_acc
 
@@ -189,6 +197,7 @@ class BankAccount:
         Системный идентификатор счёта
 
         :return: Системный идентификатор счёта
+        :rtype: str
         """
         return self.__account_id
 
@@ -198,6 +207,7 @@ class BankAccount:
         Наименование счёта
 
         :return: Наименование счёта
+        :rtype: str
         """
         return self.__name
 
@@ -207,6 +217,7 @@ class BankAccount:
         Баланс на счёте
 
         :return: Баланс на счёте (в валюте счёта)
+        :rtype: Decimal
         """
         return self.__balance
 
@@ -216,6 +227,7 @@ class BankAccount:
         Дата открытия счёта
 
         :return: Дата открытия счёта
+        :rtype: datetime.date
         """
         return self.__begin_date
 
@@ -225,12 +237,15 @@ class BankAccount:
         Категория счёта
 
         Возможные значения:
+
          - CheckingAccount (расчетный счёт),
          - DepositAccount (депозитный счёт),
          - CardAccount (карточный счёт),
          - DepositRateAccount (счёт для процентов по депозиту),
          - ReservationAccounting (счёт учета резервов)
-        :return: AccountCategory
+
+        :return: Категория счёта
+        :rtype: AccountCategory
         """
         return self.__category
 
@@ -240,11 +255,14 @@ class BankAccount:
         Код валюты
 
         Возможные значения:
+
          - RUR
          - USD
          - EUR
          - CNY
-        :return: Currency
+
+        :return: Код валюты
+        :rtype: Currency
         """
         return self.__currency
 
@@ -254,6 +272,7 @@ class BankAccount:
         Номер счёта
 
         :return: Номер счёта
+        :rtype: str
         """
         return self.__number
 
@@ -263,13 +282,16 @@ class BankAccount:
         Состояния счёта
 
         Возможные значения:
+
          - New (открытый)
          - Deleted (удалённый)
          - Closed (закрытый)
          - Freezed (замороженный)
          - ToClosed (в процессе закрытия)
          - ToOpen (в процессе открытия)
-        :return: `AccountStatus`
+
+        :return: Состояние счёта
+        :rtype: AccountStatus
         """
         return self.__status
 
@@ -278,7 +300,8 @@ class BankAccount:
         """
         Реквизиты банка
 
-        :return: Реквизиты банка в структуре :class:`Bank`
+        :return: Реквизиты банка
+        :rtype: Bank
         """
         return self.__bank
 
@@ -315,6 +338,7 @@ class BankShort:
         Номер счета
 
         :return: Номер счета
+        :rtype: str
         """
         return self.__account
 
@@ -324,6 +348,7 @@ class BankShort:
         Название банка
 
         :return: Название банка
+        :rtype: str
         """
         return self.__name
 
@@ -333,6 +358,7 @@ class BankShort:
         БИК
 
         :return: БИК
+        :rtype: str
         """
         return self.__bic
 
@@ -342,6 +368,7 @@ class BankShort:
         Корреспондентский счёт
 
         :return: Корреспондентский счёт
+        :rtype: str
         """
         return self.__corr_acc
 
@@ -351,7 +378,7 @@ class Contractor:
     Контрагент в операции.
     """
 
-    def __init__(self, obj: {} = None, name=None, inn=None, kpp=None, bank=None):
+    def __init__(self, obj: dict = None, name=None, inn=None, kpp=None, bank=None):
         """
         Конструктор
 
@@ -387,6 +414,7 @@ class Contractor:
         Полное наименование контрагента
 
         :return: Полное наименование контрагента
+        :rtype: str
         """
         return self.__name
 
@@ -396,6 +424,7 @@ class Contractor:
         ИНН контрагента
 
         :return: ИНН контрагента
+        :rtype: str
         """
         return self.__inn
 
@@ -405,6 +434,7 @@ class Contractor:
         КПП контрагента
 
         :return: КПП контрагента
+        :rtype: str
         """
         return self.__kpp or '0'
 
@@ -414,6 +444,7 @@ class Contractor:
         Банковские реквизиты контрагента (Номер счета, Название банка и БИК)
 
         :return: Банковские реквизиты контрагента
+        :rtype: BankShort
         """
         return self.__bank
 
@@ -464,6 +495,7 @@ class BudgetaryAndTax:
         Код бюджетной классификации (104)
 
         :return: Код бюджетной классификации
+        :rtype: str
         """
         return self.__kbk
 
@@ -473,6 +505,7 @@ class BudgetaryAndTax:
         Общероссийский классификатор территорий муниципальных образований (105)
 
         :return: Общероссийский классификатор территорий муниципальных образований
+        :rtype: str
         """
         return self.__oktmo
 
@@ -482,6 +515,7 @@ class BudgetaryAndTax:
         Основание платежа (106)
 
         :return: Основание платежа
+        :rtype: str
         """
         return self.__payment_basis
 
@@ -491,6 +525,7 @@ class BudgetaryAndTax:
         Налоговый период
 
         :return: Налоговый период
+        :rtype: str
         """
         return self.__tax_code
 
@@ -500,6 +535,7 @@ class BudgetaryAndTax:
         Номер документа (108)
 
         :return: Номер документа
+        :rtype: str
         """
         return self.__tax_doc_num
 
@@ -509,6 +545,7 @@ class BudgetaryAndTax:
         Дата документа (109)
 
         :return: Дата документа
+        :rtype: str
         """
         return self.__tax_doc_date
 
@@ -518,6 +555,7 @@ class BudgetaryAndTax:
         Статус плательщика (101)
 
         :return: Статус плательщика
+        :rtype: str
         """
         return self.__payer_status
 
@@ -527,6 +565,7 @@ class BudgetaryAndTax:
         Уникальный идентификатор начисления (22)
 
         :return: Уникальный идентификатор начисления
+        :rtype: str
         """
         return self.__uin
 
@@ -613,6 +652,7 @@ class Operation:
         Системный идентификатор транзакции
 
         :return: Системный идентификатор транзакции
+        :rtype: str
         """
         return self.__operation_id
 
@@ -622,6 +662,7 @@ class Operation:
         Системный идентификатор компании
 
         :return: Системный идентификатор компании
+        :rtype: str
         """
         return self.__company_id
 
@@ -631,13 +672,15 @@ class Operation:
         Текущий статус транзакции.
 
         Возможные значения:
+
          - SendToBank (Исходящая, ожидающая исполнения),
          - Executed (Исходящий исполненный),
          - RejectByBank (Исходящая, отказано банком в исполнении),
          - Canceled (Исходящая, отправленная в банк и отменённая пользователем),
          - Received (Входящая исполненная)
 
-        :return: `OperationStatus`
+        :return: Текущий статус транзакции
+        :rtype: OperationStatus
         """
         return self.__status
 
@@ -647,10 +690,12 @@ class Operation:
         Направление платежа.
 
         Возможные значения:
+
          - Debet (входящая),
          - Credit (исходящая)
 
-        :return: `OperationCategory`
+        :return: Направление платежа
+        :rtype: OperationCategory
         """
         return self.__category
 
@@ -660,12 +705,14 @@ class Operation:
         Код валюты.
 
         Возможные значения:
+
          - RUR,
          - EUR,
          - USD,
          - CNY
 
-        :return: `Currency`
+        :return: Код валюты
+        :rtype: Currency
         """
         return self.__currency
 
@@ -675,6 +722,7 @@ class Operation:
         Сумма платежа без учета банковской комиссии
 
         :return: Сумма платежа без учета банковской комиссии
+        :rtype: Decimal
         """
         return self.__amount
 
@@ -684,6 +732,7 @@ class Operation:
         Сумма платежа с учетом банковской комиссии
 
         :return: Сумма платежа с учетом банковской комиссии
+        :rtype: Decimal
         """
         return self.__amount_with_commission
 
@@ -693,6 +742,7 @@ class Operation:
         Номер банковского счета
 
         :return: Номер банковского счета
+        :rtype: str
         """
         return self.__account_number
 
@@ -702,6 +752,7 @@ class Operation:
         Назначение платежа
 
         :return: Назначение платежа
+        :rtype: str
         """
         return self.__purpose
 
@@ -711,6 +762,7 @@ class Operation:
         Дата проведения платежа
 
         :return: Дата проведения платежа
+        :rtype: datetime.datetime
         """
         return self.__executed
 
@@ -720,6 +772,7 @@ class Operation:
         Дата создания транзакции
 
         :return: Дата создания транзакции
+        :rtype: datetime.datetime
         """
         return self.__created
 
@@ -729,6 +782,7 @@ class Operation:
         Номер документа
 
         :return: Номер документа
+        :rtype: str
         """
         return self.__doc_number
 
@@ -738,6 +792,7 @@ class Operation:
         Контрагент
 
         :return: Контрагент
+        :rtype: Contractor
         """
         return self.__contractor
 
@@ -747,6 +802,7 @@ class Operation:
         Параметры бюджетных и налоговых платежей в операции
 
         :return:  Параметры бюджетных и налоговых платежей в операции
+        :rtype: BudgetaryAndTax
         """
         return self.__budgetary_and_tax
 
@@ -783,36 +839,90 @@ class PaymentOrder:
 
     @property
     def doc_num(self) -> str:
+        """
+        Номер документа
+
+        :return: Номер документа
+        :rtype: str
+        """
         return self.__doc_num
 
     @property
     def account_num(self) -> str:
+        """
+        Номер банковского счета
+
+        :return: Номер банковского счета
+        :rtype: str
+        """
         return self.__account_num
 
     @property
     def amount(self) -> Decimal:
+        """
+        Сумма платежа
+
+        :return: Сумма платежа
+        :rtype: Decimal
+        """
         return self.__amount
 
     @property
     def purpose(self) -> str:
+        """
+        Назначение платежа
+
+        :return: Назначение платежа
+        :rtype: str
+        """
         return self.__purpose
 
     @property
     def payer(self) -> Contractor:
+        """
+        Плательщик
+
+        :return: Плательщик
+        :rtype: Contractor
+        """
         return self.__payer
 
     @property
     def recipient(self) -> Contractor:
+        """
+        Получатель
+
+        :return: Получатель
+        :rtype: Contractor
+        """
         return self.__recipient
 
     @property
     def payment_type(self) -> str:
+        """
+        Вид оплаты. По умолчанию '01'.
+
+        :return: Вид оплаты
+        :rtype: str
+        """
         return self.__type
 
     @property
     def priority(self) -> str:
+        """
+        Очередность. По умолчанию '5'.
+
+        :return: Очередность
+        :rtype: str
+        """
         return self.__priority
 
     @property
     def date(self) -> datetime.date:
+        """
+        Дата подготовки платежа
+
+        :return: Дата подготовки платежа
+        :rtype: datetime.date
+        """
         return self.__date

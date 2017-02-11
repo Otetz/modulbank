@@ -20,18 +20,19 @@ Python client for ModulBank REST API
 Installation
 ------------
 
-Install modulbank package from PyPi::
+Install modulbank package from `PyPI <https://pypi.python.org/pypi>`_
+::
 
   pip install modulbank
 
 Getting started
 ---------------
 
-Make sure to include this line in the beginning of your file::
+Make sure to include this line in the beginning of your code::
 
   from modulbank import *
 
-Set your API Token and choose sandbox mode or off::
+Set your *API Token* and choose *sandbox mode* ``on`` or ``off``::
 
   client = ModulbankClient(token=MODULBANK_TOKEN, sandbox_mode=True)
 

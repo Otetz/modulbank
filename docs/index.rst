@@ -6,6 +6,8 @@
 Welcome to modulbank's documentation!
 =====================================
 
+.. include:: ../README
+
 .. toctree::
    :maxdepth: 4
    :caption: Contents:

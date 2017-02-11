@@ -19,10 +19,10 @@ class SearchOptions:
         """
         Конструктор
 
-        :param category: Направление платежа. Возможные значения см. в `SearchCategory`
-        :param date_from: Вывести операции от момента времени (дата проведения которых равна указанной, или младше)
-        :param date_till: Вывести операции до момента времени (дата проведения которых равна указанной, или старше)
-        :param page: Номер страницы постраничного вывода (начиная с 0, размер определяется в :class:`ModulbankClient`)
+        :param OperationCategory category: Направление платежа. Возможные значения см. в :class:`SearchCategory`
+        :param datetime.date date_from: Вывести операции от момента времени (дата проведения которых равна указанной, или младше)
+        :param datetime.date date_till: Вывести операции до момента времени (дата проведения которых равна указанной, или старше)
+        :param int page: Номер страницы постраничного вывода (начиная с 0, размер определяется в :class:`ModulbankClient`)
         """
         self.__category = category
         self.__from = date_from
@@ -35,9 +35,12 @@ class SearchOptions:
         Направление платежа
 
         Возможные значения:
+
          - `OperationCategory.Debet` - входящий;
          - `OperationCategory.Credit` - исходящий
-        :return: `OperationCategory`
+
+        :return: Направление платежа
+        :rtype: OperationCategory
         """
         return self.__category
 
@@ -46,7 +49,8 @@ class SearchOptions:
         """
         Вывести операции от момента времени
 
-        :return: Момент времен "от" `datetime.date`
+        :return: Момент времен "от"
+        :rtype: datetime.date
         """
         return self.__from
 
@@ -55,7 +59,8 @@ class SearchOptions:
         """
         Вывести операции до момента времени
 
-        :return: Момент времен "до" `datetime.date`
+        :return: Момент времен "до"
+        :rtype: datetime.date
         """
         return self.__till
 
@@ -67,14 +72,16 @@ class SearchOptions:
         Начиная с 0, размер определяется в конструкторе :class:`ModulbankClient`
 
         :return: Номер страницы
+        :rtype: int
         """
         return self.__page
 
-    def to_dict(self) -> {}:
+    def to_dict(self) -> dict:
         """
-        Возвращает парметры поиска в виде словаря (для последующей запаковки в JSOn-объект).
+        Возвращает парметры поиска в виде словаря (для последующей запаковки в JSON-объект).
 
         :return: Словарь критериев поиска.
+        :rtype: dict
         """
         criteria = {}
         if self.category:
@@ -90,7 +97,8 @@ class SearchOptions:
 
 class PaymentResponse:
     """
-    Ответ на импорт платежек в API МодульБанка
+    Ответ на импорт платёжек в API МодульБанка, содержащий количество загруженных платёжных поручений и ошибки по
+    незагруженным платёжным поручениям при их наличии
     """
 
     def __init__(self, obj: {}):
@@ -112,15 +120,17 @@ class PaymentResponse:
         Количество загруженных платежных поручений
 
         :return: Количество загруженных платежных поручений
+        :rtype: int
         """
         return self.__total_loaded
 
     @property
-    def errors(self) -> []:
+    def errors(self) -> list:
         """
         Ошибки по незагруженным платежным поручениям
 
         :return: Ошибки по незагруженным платежным поручениям
+        :rtype: list(str)
         """
         return self.__errors
 
@@ -129,15 +139,16 @@ class ModulbankClient:
     """
     МодульБанк для Python-разработчиков.
     """
-    api_url = "https://api.modulbank.ru/v1/"
+    _api_url = "https://api.modulbank.ru/v1/"
 
-    def __init__(self, token, sandbox_mode=False, page_size: int = 50):
+    def __init__(self, token: str, sandbox_mode: bool = False, page_size: int = 50):
         """
         Конструктор
 
-        :param token: Токен из Личного Кабинета пользователя МодульБанка.
-        :param sandbox_mode: Нужен ли `режим песочницы`
-        :param page_size: Размер страницы операций, в штуках. От 0 до 50.
+        :param str token: Токен из Личного Кабинета пользователя МодульБанка.
+        :param bool sandbox_mode: Нужен ли `режим песочницы`
+        :param int page_size: Размер страницы операций, в штуках. От 0 до 50.
+        :raises ValueError: Если размер страницы превышает 50 операций
         """
         self.__token = token
         self.__sandbox_mode = sandbox_mode
@@ -152,15 +163,29 @@ class ModulbankClient:
         return "<ModulbankClient token='…' sandbox_mode='{sandbox_mode}' page_size={page_size}>".format(
             sandbox_mode=self.__sandbox_mode, page_size=self.__page_size)
 
-    def accounts(self) -> []:
+    @property
+    def token(self) -> str:
+        """
+        Токен API
+
+        :return: Токен API
+        :rtype: str
+        """
+        return self.__token
+
+    def accounts(self) -> list:
         """
         Получение информации о компаниях пользователя
 
         Метод в API: https://api.modulbank.ru/v1/account-info
 
         :return: Массив компаний, представленных структурой :class:`Company`
+        :rtype: list(Company)
+        :raises NotAuthorizedModulbankException: Если не прошли авторизацию.
+        :raises UnexpectedResponseStatusModulbankException: Если статус ответа сервера отлиается от ожидаемого.
+        :raises UnexpectedResponseBodyModulbankException: Если не удалось обработать полученные данные.
         """
-        r = requests.post(self.api_url + 'account-info', json={}, headers=self.__headers)
+        r = requests.post(self._api_url + 'account-info', json={}, headers=self.__headers)
         if r.status_code == 401:
             raise NotAuthorizedModulbankException()
         if r.status_code != 200:
@@ -175,12 +200,16 @@ class ModulbankClient:
         """
         Получение баланса по счёту
 
-        Метод в API: https://api.modulbank.ru/v1/account-info/balance/<bankAccountId>
+        Метод в API: https://api.modulbank.ru/v1/account-info/balance/<account_id>
 
-        :param account_id: Системный идентификатор счёта
-        :return: :class:`Decimal` Сумма остатка денежных средств на счёте
+        :param str account_id: Системный идентификатор счёта
+        :return: Сумма остатка денежных средств на счёте
+        :rtype: Decimal
+        :raises NotAuthorizedModulbankException: Если не прошли авторизацию.
+        :raises UnexpectedResponseStatusModulbankException: Если статус ответа сервера отлиается от ожидаемого.
+        :raises UnexpectedValueModulbankException: Если не удалось конвертировать полученное значение.
         """
-        r = requests.post(self.api_url + 'account-info/balance/{id}'.format(id=account_id), json={},
+        r = requests.post(self._api_url + 'account-info/balance/{id}'.format(id=account_id), json={},
                           headers=self.__headers)
         if r.status_code == 401:
             raise NotAuthorizedModulbankException()
@@ -192,32 +221,43 @@ class ModulbankClient:
             raise UnexpectedValueModulbankException('Balance %s as Decimal' % r.text)
         return res
 
-    def operations(self, account_id: str, search: SearchOptions = SearchOptions()) -> []:
+    def operations(self, account_id: str, search: SearchOptions = None) -> list:
         """
         Просмотр истории операций
 
-        Метод в API: https://api.modulbank.ru/v1/operation-history/<bankAccountId>
+        Метод в API: https://api.modulbank.ru/v1/operation-history/<account_id>
 
-        :param account_id: Системный идентификатор счёта
-        :param search: :class:`SearchOptions` Опциональные параметры поиска операций
+        :param str account_id: Системный идентификатор счёта
+        :param SearchOptions search: Опциональные параметры поиска операций
         :return: Массив операций, представленных структурой :class:`Operation`
+        :rtype: list(Operation)
+        :raises NotAuthorizedModulbankException: Если не прошли авторизацию.
+        :raises UnexpectedResponseStatusModulbankException: Если статус ответа сервера отлиается от ожидаемого.
+        :raises UnexpectedResponseBodyModulbankException: Если не удалось обработать полученные данные.
         """
+        if search is None:
+            search = SearchOptions()
         criteria = self.__patch_paging(search.to_dict())
-        r = requests.post(self.api_url + 'operation-history/{id}'.format(id=account_id),
+        r = requests.post(self._api_url + 'operation-history/{id}'.format(id=account_id),
                           json=criteria,
                           headers=self.__headers)
+        if r.status_code == 401:
+            raise NotAuthorizedModulbankException()
+        if r.status_code != 200:
+            raise UnexpectedResponseStatusModulbankException(r.status_code)
         try:
             res = [Operation(x) for x in r.json()]
         except ValueError:
             raise UnexpectedResponseBodyModulbankException(r.text)
         return res
 
-    def __patch_paging(self, param):
+    def __patch_paging(self, param: dict):
         """
         Правка критериев поиска в плане пейджинга.
 
-        :param param: Критерии поиска
+        :param dict param: Критерии поиска
         :return: Поправленные критерии поиска
+        :rtype: dict
         """
         if 'page' not in param:
             return param
@@ -230,24 +270,43 @@ class ModulbankClient:
 
     def create_payment_draft(self, order: PaymentOrder) -> PaymentResponse:
         """
-        Создание ерновика платёжки.
+        Создание черновика платёжки.
 
         Все создаваемые через API платежные поручения имеют статус "Черновик". Подписание поручений возможно только
         внутри личного кабинета.
 
-        :return: `PaymentResponse`
+        Метод в API: https://api.modulbank.ru/v1/operation-upload/1c
+
+        :param PaymentOrder order: Объект платёжного поручения
+        :return: Ответ API МодульБанка, содержащий количество загруженных платёжных поручений и ошибки по незагруженным платёжным поручениям при их наличии
+        :rtype: PaymentResponse
+        :raises NotAuthorizedModulbankException: Если не прошли авторизацию.
+        :raises UnexpectedResponseStatusModulbankException: Если статус ответа сервера отлиается от ожидаемого.
+        :raises UnexpectedResponseBodyModulbankException: Если не удалось обработать полученные данные.
         """
         exchange = ClientBankExchange()
         # noinspection PyTypeChecker
         self.__fill_client_bank_exchange(order, exchange)
-        r = requests.post(self.api_url + 'operation-upload/1c', json={"document": exchange.document},
+        r = requests.post(self._api_url + 'operation-upload/1c', json={"document": exchange.document},
                           headers=self.__headers)
+        if r.status_code == 401:
+            raise NotAuthorizedModulbankException()
         if r.status_code != 200:
             raise UnexpectedResponseStatusModulbankException(r.status_code)
-        return PaymentResponse(r.json())
+        try:
+            res = PaymentResponse(r.json())
+        except ValueError:
+            raise UnexpectedResponseBodyModulbankException(r.text)
+        return res
 
     @staticmethod
     def __fill_client_bank_exchange(order, exchange):
+        """
+        Заполнение полей платежного поручения
+
+        :param PaymentOrder order: Объект платёжного поручения
+        :param ClientBankExchange exchange: Объект обмена данными в формате 1С
+        """
         exchange.УсловияОтбора.РасчСчет = order.account_num
         exchange.СекцияПлатежногоДокумента.Номер = order.doc_num
         exchange.СекцияПлатежногоДокумента.Дата = order.date

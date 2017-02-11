@@ -20,18 +20,19 @@ Python client for ModulBank REST API
 Installation
 ------------
 
-Install modulbank package from PyPi::
+Install modulbank package from `PyPI <https://pypi.python.org/pypi>`_
+::
 
   pip install modulbank
 
 Getting started
 ---------------
 
-Make sure to include this line in the beginning of your file::
+Make sure to include this line in the beginning of your code::
 
   from modulbank import *
 
-Set your API Token and choose sandbox mode or off::
+Set your *API Token* and choose *sandbox mode* ``on`` or ``off``::
 
   client = ModulbankClient(token=MODULBANK_TOKEN, sandbox_mode=True)
 
@@ -47,16 +48,49 @@ Or send payment order::
                    payer=Contractor(name='Индивидуальный предприниматель Александров Александр Александрович',
                                     inn='770400372208',
                                     bank=BankShort(account='40802810670010011008',
-                                                   name='МОСКОВСКИЙ ФИЛИАЛ АО КБ \"МОДУЛЬБАНК\"',
+                                                   name='МОСКОВСКИЙ ФИЛИАЛ АО КБ "МОДУЛЬБАНК"',
                                                    bic='044525092', corr_acc='30101810645250000092')),
-                   recipient=Contractor(name='МОСКОВСКИЙ ФИЛИАЛ АО КБ \"МОДУЛЬБАНК\"',
+                   recipient=Contractor(name='МОСКОВСКИЙ ФИЛИАЛ АО КБ "МОДУЛЬБАНК"',
                                         inn='2204000595', kpp='771543001',
                                         bank=BankShort(account='30102810675250000092',
-                                                       name='МОСКОВСКИЙ ФИЛИАЛ АО КБ \"МОДУЛЬБАНК\"',
+                                                       name='МОСКОВСКИЙ ФИЛИАЛ АО КБ "МОДУЛЬБАНК"',
                                                        bic='044525092', corr_acc='30102810675250000092')))
   res = client.create_payment_draft(p)
   assert len(res.errors) == 0
   assert res.total_loaded == 1
+
+Helper class for processing web-hooks
+-------------------------------------
+
+Sample usage of class ``NotifyRequest``::
+
+  @app.route('/modulbank', methods=['POST'])
+  def notify():
+    client = ModulbankClient(token=MODULBANK_TOKEN)
+
+    if not request.is_json:
+        return make_response(render_template('template.json'), 400)
+
+    nr = NotifyRequest(request.json)
+
+    # Filter only needed company's operations
+    if nr.inn != INN or nr.kpp != KPP:
+        return make_response(render_template('template.json'), 200)
+
+    # Check signature in `SHA1Hash` field
+    if not nr.check_signature(MODULBANK_TOKEN):
+        return make_response(render_template('template.json'), 403)
+
+    #
+    # Make something with `nr`
+    #
+
+    make_response(render_template('template.json'), 200)
+
+TODO
+----
+
+- OAuth 2 authorization.
 
 Links
 -----

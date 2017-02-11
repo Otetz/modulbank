@@ -4,6 +4,9 @@ from decimal import Decimal, ROUND_HALF_DOWN
 
 
 class BaseSection:
+    """
+    Абстрактный базовый класс для секций документа обмена данными
+    """
     _fields = []
     _mandatory_fields = []
 
@@ -14,7 +17,13 @@ class BaseSection:
         return s
 
     @property
-    def document(self):
+    def document(self) -> str:
+        """
+        Свойство выдает полностью сформированную секцию документа в формате 1С.
+
+        :return: Текст секции
+        :rtype: str
+        """
         s = ""
         for name in self._mandatory_fields:
             value = self.__dict__[name]
@@ -42,6 +51,9 @@ class BaseSection:
 
 
 class GeneralSection(BaseSection):
+    """
+    `Общая` секция
+    """
     _fields = ['ВерсияФормата', 'Кодировка', 'Отправитель', 'Получатель', 'ДатаСоздания', 'ВремяСоздания']
     _mandatory_fields = ['ВерсияФормата', 'Кодировка', 'Отправитель']
 
@@ -64,6 +76,9 @@ class GeneralSection(BaseSection):
 
 
 class FilterSection(BaseSection):
+    """
+    Секция `Фильтров`
+    """
     _fields = ['ДатаНачала', 'ДатаКонца', 'РасчСчет', 'Документ']
     _mandatory_fields = ['ДатаНачала', 'ДатаКонца', 'РасчСчет']
 
@@ -78,6 +93,9 @@ class FilterSection(BaseSection):
 
 
 class BalancesSection(BaseSection):
+    """
+    Секция `Начальных остатков`
+    """
     _fields = ['ДатаНачала', 'ДатаКонца', 'РасчСчет', 'НачальныйОстаток', 'ВсегоПоступило', 'ВсегоСписано',
                'КонечныйОстаток']
     _mandatory_fields = []
@@ -90,6 +108,9 @@ class BalancesSection(BaseSection):
 
 
 class DocumentSection(BaseSection):
+    """
+    Секция `Документ`
+    """
     _fields = ['Номер', 'Дата', 'Сумма', 'КвитанцияДата', 'КвитанцияВремя', 'КвитанцияСодержание', 'ПлательщикСчет',
                'ДатаСписано', 'Плательщик', 'ПлательщикИНН', 'Плательщик1', 'Плательщик2', 'Плательщик3',
                'Плательщик4', 'ПлательщикРасчСчет', 'ПлательщикБанк1', 'ПлательщикБанк2', 'ПлательщикБИК',
@@ -135,7 +156,13 @@ class ClientBankExchange:
         return s
 
     @property
-    def document(self):
+    def document(self) -> str:
+        """
+        Свойство выдает полностью сформированный документ обмена данными клиент-банк-клиент в формате 1С.
+
+        :return: Текст документа
+        :rtype: str
+        """
         s = "1CClientBankExchange\n{body}КонецФайла"
         body = self.__dict__['ОбщиеСведения'].document
         body += self.__dict__['УсловияОтбора'].document

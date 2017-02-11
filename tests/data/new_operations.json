@@ -1,0 +1,33 @@
+{
+  "companyInn": "1111111111",
+  "companyKpp": "",
+  "operation": {
+    "id": "a4b825ca-a6f8-4996-a1db-a5f3028bb68d",
+    "companyId": "599ebe36-ed20-49c4-b802-a5ec0329ebce",
+    "status": "Received",
+    "category": "Debet",
+    "contragentName": "Индивидуальный предприниматель Иванов Иван Иванович",
+    "contragentInn": "1111111111",
+    "contragentKpp": "",
+    "contragentBankAccountNumber": "30101810000000000005",
+    "contragentBankName": "МОСКОВСКИЙ ФИЛИАЛ ОАО КБ\"РЕГИОНАЛЬНЫЙ КРЕДИТ\"",
+    "contragentBankBic": "044583340",
+    "currency": "RUR",
+    "amount": 100000.0,
+    "amountWithCommission": 100000.0,
+    "bankAccountNumber": "30101810000000000001",
+    "paymentPurpose": "Оплата по счету №4 от 01.04.2016 г. Без НДС",
+    "executed": "2016-04-01T00:00:00",
+    "created": "2016-04-01T00:00:00",
+    "docNumber": "4",
+    "kbk": "",
+    "oktmo": "",
+    "paymentBasis": "",
+    "taxCode": "",
+    "taxDocNum": "",
+    "taxDocDate": "",
+    "payerStatus": "",
+    "uin": ""
+  },
+  "SHA1Hash": "c039243e64c11635afbc1bd99185e34313702d43"
+}

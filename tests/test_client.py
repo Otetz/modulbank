@@ -237,6 +237,7 @@ def test_client_bank_exchange_str():
     assert exchange.document.startswith('1CClientBankExchange')
 
 
+# noinspection PyShadowingNames
 def test_notify_request(client: ModulbankClient):
     data = json_from_file('new_operations.json')
     nr = NotifyRequest(data)

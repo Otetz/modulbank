@@ -24,15 +24,14 @@ class Company:
 
         :param dict obj: JSON-объект компании из API МодульБанка.
         """
-        if 'companyId' in obj:
-            self.__company_id = obj['companyId']
-        if 'companyName' in obj:
-            self.__name = obj['companyName']
-        if 'bankAccounts' in obj:
-            self.__bank_accounts = [BankAccount(x) for x in obj['bankAccounts']]
+        self.__company_id = obj.get('companyId')
+        self.__name = obj.get('companyName')
+        self.__bank_accounts = [BankAccount(x) for x in obj.get('bankAccounts', [])]
 
     def __str__(self):
-        return "<Company name={s.name} id={s.company_id}>".format(s=self)
+        return ('<%s ' % self.__class__.__name__) + ' '.join(
+            ['%s:%s' % (k.replace('_' + self.__class__.__name__, '').lstrip('_'), str(self.__dict__[k]))
+             for k in self.__dict__]) + '>'
 
     @property
     def company_id(self) -> str:
@@ -76,19 +75,18 @@ class Bank:
 
         :param dict obj: JSON-объект банковского счёта (!) из API МодульБанка.
         """
-        if 'bankBic' in obj:
-            self.__bic = obj['bankBic']
-        if 'bankInn' in obj:
-            self.__inn = obj['bankInn']
-        if 'bankKpp' in obj:
-            self.__kpp = obj['bankKpp']
-        if 'bankCorrespondentAccount' in obj:
-            self.__corr_acc = obj['bankCorrespondentAccount']
-        if 'bankName' in obj:
-            self.__name = obj['bankName']
+        self.__bic = obj.get('bankBic')
+        self.__inn = obj.get('bankInn')
+        self.__kpp = obj.get('bankKpp')
+        self.__corr_acc = obj.get('bankCorrespondentAccount')
+        self.__name = obj.get('bankName')
 
     def __str__(self):
-        return "<Bank БИК={s.bic} ИНН={s.inn} КПП={s.kpp} name={s.name} к/сч={s.corr_account}>".format(s=self)
+        names = {'bic': 'БИК', 'inn': 'ИНН', 'kpp': 'КПП', 'corr_acc': 'к/сч'}
+        return ('<%s ' % self.__class__.__name__) + ' '.join(
+            ['%s:%s' % (names.get(k.replace('_' + self.__class__.__name__, '').lstrip('_'),
+                                  k.replace('_' + self.__class__.__name__, '').lstrip('_')), str(self.__dict__[k]))
+             for k in self.__dict__]) + '>'
 
     @property
     def bic(self) -> str:
@@ -152,45 +150,37 @@ class BankAccount:
 
         :param dict obj: JSON-объект банковского счёта из API МодульБанка.
         """
-        if 'id' in obj:
-            self.__account_id = obj['id']
-        if 'accountName' in obj:
-            self.__name = obj['accountName']
-        if 'balance' in obj:
-            try:
-                self.__balance = Decimal(obj['balance'])
-            except InvalidOperation:
-                raise UnexpectedValueModulbankException('Balance %s as Decimal' % obj['balance'])
-        if 'beginDate' in obj:
-            try:
-                self.__begin_date = datetime.datetime.strptime(obj['beginDate'], '%Y-%m-%dT%H:%M:%S').date()
-            except ValueError:
-                raise UnexpectedValueModulbankException('BeginDate %s as datetime.date' % obj['beginDate'])
-        if 'category' in obj:
-            try:
-                self.__category = AccountCategory[obj['category']]
-            except KeyError:
-                raise UnexpectedValueModulbankException('AccountCategory %s as AccountCategory' % obj['category'])
-        if 'currency' in obj:
-            try:
-                self.__currency = Currency[obj['currency']]
-            except KeyError:
-                raise UnexpectedValueModulbankException('Currency %s as Currency' % obj['currency'])
-        if 'number' in obj:
-            self.__number = obj['number']
-        if 'status' in obj:
-            try:
-                self.__status = AccountStatus[obj['status']]
-            except KeyError:
-                raise UnexpectedValueModulbankException('AccountStatus %s as AccountStatus' % obj['status'])
+        self.__account_id = obj.get('id')
+        self.__name = obj.get('accountName')
+        try:
+            self.__balance = Decimal(obj.get('balance'))
+        except InvalidOperation:
+            raise UnexpectedValueModulbankException('Balance %s as Decimal' % obj.get('balance'))
+        try:
+            self.__begin_date = datetime.datetime.strptime(obj.get('beginDate'), '%Y-%m-%dT%H:%M:%S').date()
+        except ValueError:
+            raise UnexpectedValueModulbankException('BeginDate %s as datetime.date' % obj.get('beginDate'))
+        try:
+            self.__category = AccountCategory[obj.get('category')]
+        except KeyError:
+            raise UnexpectedValueModulbankException('AccountCategory %s as AccountCategory' % obj.get('category'))
+        try:
+            self.__currency = Currency[obj.get('currency')]
+        except KeyError:
+            raise UnexpectedValueModulbankException('Currency %s as Currency' % obj.get('currency'))
+        self.__number = obj.get('number')
+        try:
+            self.__status = AccountStatus[obj.get('status')]
+        except KeyError:
+            raise UnexpectedValueModulbankException('AccountStatus %s as AccountStatus' % obj.get('status'))
         if 'bankBic' in obj or 'bankInn' in obj or 'bankKpp' in obj or 'bankCorrespondentAccount' in obj \
                 or 'bankName' in obj:
             self.__bank = Bank(obj)
 
     def __str__(self):
-        return "<BankAccount name={s.name} id={s.account_id} balance={s.balance} beginDate={s.begin_date} " \
-               "category={s.category} currency={s.currency} number={s.number} status={s.status} \n" \
-               "bank= {s.bank}>".format(s=self)
+        return ('<%s ' % self.__class__.__name__) + ' '.join(
+            ['%s:%s' % (k.replace('_' + self.__class__.__name__, '').lstrip('_'), str(self.__dict__[k]))
+             for k in self.__dict__]) + '>'
 
     @property
     def account_id(self) -> str:
@@ -329,9 +319,9 @@ class BankShort:
         self.__corr_acc = corr_acc
 
     def __str__(self):
-        s = "<BankShort account={s.account} name={s.name} bic={s.bic}{corr_acc}>" \
-            .format(s=self, corr_acc=self.corr_acc and " к/сч=" + self.corr_acc or '')
-        return s
+        return ('<%s ' % self.__class__.__name__) + ' '.join(
+            ['%s:%s' % (k.replace('_' + self.__class__.__name__, '').lstrip('_'), str(self.__dict__[k]))
+             for k in self.__dict__]) + '>'
 
     @property
     def account(self) -> str:
@@ -390,16 +380,13 @@ class Contractor:
         :param BankShort bank:
         """
         if obj:
-            if 'contragentName' in obj:
-                self.__name = obj['contragentName']
-            if 'contragentInn' in obj:
-                self.__inn = obj['contragentInn']
-            if 'contragentKpp' in obj:
-                self.__kpp = obj['contragentKpp']
+            self.__name = obj.get('contragentName')
+            self.__inn = obj.get('contragentInn')
+            self.__kpp = obj.get('contragentKpp')
             if 'contragentBankAccountNumber' in obj or 'contragentBankName' in obj or 'contragentBankBic' in obj:
-                self.__bank = BankShort(account=obj['contragentBankAccountNumber'] or None,
-                                        name=obj['contragentBankName'] or None,
-                                        bic=obj['contragentBankBic'] or None)
+                self.__bank = BankShort(account=obj.get('contragentBankAccountNumber'),
+                                        name=obj.get('contragentBankName'),
+                                        bic=obj.get('contragentBankBic'))
         else:
             self.__name = name
             self.__inn = inn
@@ -407,7 +394,9 @@ class Contractor:
             self.__bank = bank
 
     def __str__(self):
-        return "<Contractor name={s.name} inn={s.inn} kpp={s.kpp} bank:{s.bank}>".format(s=self)
+        return ('<%s ' % self.__class__.__name__) + ' '.join(
+            ['%s:%s' % (k.replace('_' + self.__class__.__name__, '').lstrip('_'), str(self.__dict__[k]))
+             for k in self.__dict__]) + '>'
 
     @property
     def name(self) -> str:
@@ -461,34 +450,19 @@ class BudgetaryAndTax:
 
         :param dict obj: JSON-объект операции по счёту из API МодульБанка.
         """
-        if 'kbk' in obj:
-            self.__kbk = obj['kbk']
-        if 'oktmo' in obj:
-            self.__oktmo = obj['oktmo']
-        if 'paymentBasis' in obj:
-            self.__payment_basis = obj['paymentBasis']
-        if 'taxCode' in obj:
-            self.__tax_code = obj['taxCode']
-        if 'taxDocNum' in obj:
-            self.__tax_doc_num = obj['taxDocNum']
-        if 'taxDocDate' in obj:
-            self.__tax_doc_date = obj['taxDocDate']
-        if 'payerStatus' in obj:
-            self.__payer_status = obj['payerStatus']
-        if 'uin' in obj:
-            self.__uin = obj['uin']
+        self.__kbk = obj.get('kbk')
+        self.__oktmo = obj.get('oktmo')
+        self.__payment_basis = obj.get('paymentBasis')
+        self.__tax_code = obj.get('taxCode')
+        self.__tax_doc_num = obj.get('taxDocNum')
+        self.__tax_doc_date = obj.get('taxDocDate')
+        self.__payer_status = obj.get('payerStatus')
+        self.__uin = obj.get('uin')
 
     def __str__(self):
-        s = "<BudgetaryAndTax{kbk}{oktmo}{payment_basis}{tax_code}{tax_doc_num}{tax_doc_date}{payer_status}" \
-            "{uin}>".format(kbk=self.kbk and ' kbk=' + self.kbk or '',
-                            oktmo=self.oktmo and ' oktmo=' + self.oktmo or '',
-                            payment_basis=self.payment_basis and ' payment_basis=' + self.payment_basis or '',
-                            tax_code=self.tax_code and ' tax_code=' + self.tax_code or '',
-                            tax_doc_num=self.tax_doc_num and ' tax_doc_num=' + self.tax_doc_num or '',
-                            tax_doc_date=self.tax_doc_date and ' tax_doc_date=' + self.tax_doc_date or '',
-                            payer_status=self.payer_status and ' payer_status=' + self.payer_status or '',
-                            uin=self.uin and ' uin=' + self.uin or '')
-        return s
+        return ('<%s ' % self.__class__.__name__) + ' '.join(
+            ['%s:%s' % (k.replace('_' + self.__class__.__name__, '').lstrip('_'), str(self.__dict__[k]))
+             for k in self.__dict__]) + '>'
 
     @property
     def kbk(self) -> str:
@@ -582,55 +556,43 @@ class Operation:
 
         :param dict obj: JSON-объект операции по счёту из API МодульБанка.
         """
-        if 'id' in obj:
-            self.__operation_id = obj['id']
-        if 'companyId' in obj:
-            self.__company_id = obj['companyId']
-        if 'status' in obj:
+        self.__operation_id = obj.get('id')
+        self.__company_id = obj.get('companyId')
+        try:
+            self.__status = OperationStatus[obj.get('status')]
+        except KeyError:
+            raise UnexpectedValueModulbankException('OperationStatus %s as OperationStatus' % obj.get('status'))
+        try:
+            self.__category = OperationCategory[obj.get('category')]
+        except KeyError:
+            raise UnexpectedValueModulbankException('OperationCategory %s as OperationCategory' % obj.get('category'))
+        try:
+            self.__currency = Currency[obj.get('currency')]
+        except KeyError:
+            raise UnexpectedValueModulbankException('Currency %s as Currency' % obj.get('currency'))
+        try:
+            self.__amount = Decimal(obj.get('amount'))
+        except InvalidOperation:
+            raise UnexpectedValueModulbankException('Amount %s as Decimal' % obj.get('amount'))
+        try:
+            self.__amount_with_commission = Decimal(obj.get('amountWithCommission'))
+        except InvalidOperation:
+            raise UnexpectedValueModulbankException(
+                'AmountWithCommission %s as Decimal' % obj.get('amountWithCommission'))
+        self.__account_number = obj.get('bankAccountNumber')
+        self.__purpose = obj.get('paymentPurpose')
+        try:
+            self.__executed = datetime.datetime.strptime(obj.get('executed'), '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            raise UnexpectedValueModulbankException('Executed %s as datetime.datetime' % obj.get('executed'))
+        try:
+            self.__created = datetime.datetime.strptime(obj.get('created'), '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
             try:
-                self.__status = OperationStatus[obj['status']]
-            except KeyError:
-                raise UnexpectedValueModulbankException('OperationStatus %s as OperationStatus' % obj['status'])
-        if 'category' in obj:
-            try:
-                self.__category = OperationCategory[obj['category']]
-            except KeyError:
-                raise UnexpectedValueModulbankException('OperationCategory %s as OperationCategory' % obj['category'])
-        if 'currency' in obj:
-            try:
-                self.__currency = Currency[obj['currency']]
-            except KeyError:
-                raise UnexpectedValueModulbankException('Currency %s as Currency' % obj['currency'])
-        if 'amount' in obj:
-            try:
-                self.__amount = Decimal(obj['amount'])
-            except InvalidOperation:
-                raise UnexpectedValueModulbankException('Amount %s as Decimal' % obj['amount'])
-        if 'amountWithCommission' in obj:
-            try:
-                self.__amount_with_commission = Decimal(obj['amountWithCommission'])
-            except InvalidOperation:
-                raise UnexpectedValueModulbankException(
-                    'AmountWithCommission %s as Decimal' % obj['amountWithCommission'])
-        if 'bankAccountNumber' in obj:
-            self.__account_number = obj['bankAccountNumber']
-        if 'paymentPurpose' in obj:
-            self.__purpose = obj['paymentPurpose']
-        if 'executed' in obj:
-            try:
-                self.__executed = datetime.datetime.strptime(obj['executed'], '%Y-%m-%dT%H:%M:%S')
+                self.__created = datetime.datetime.strptime(obj.get('created'), '%Y-%m-%dT%H:%M:%S.%f')
             except ValueError:
-                raise UnexpectedValueModulbankException('Executed %s as datetime.datetime' % obj['executed'])
-        if 'created' in obj:
-            try:
-                self.__created = datetime.datetime.strptime(obj['created'], '%Y-%m-%dT%H:%M:%S')
-            except ValueError:
-                try:
-                    self.__created = datetime.datetime.strptime(obj['created'], '%Y-%m-%dT%H:%M:%S.%f')
-                except ValueError:
-                    raise UnexpectedValueModulbankException('Created %s as datetime.datetime' % obj['created'])
-        if 'docNumber' in obj:
-            self.__doc_number = obj['docNumber']
+                raise UnexpectedValueModulbankException('Created %s as datetime.datetime' % obj.get('created'))
+        self.__doc_number = obj.get('docNumber')
         if 'contragentName' in obj or 'contragentInn' in obj or 'contragentKpp' in obj \
                 or 'contragentBankAccountNumber' in obj or 'contragentBankName' in obj or 'contragentBankBic' in obj:
             self.__contractor = Contractor(obj)
@@ -641,14 +603,9 @@ class Operation:
             self.__budgetary_and_tax = None
 
     def __str__(self):
-        return "<Operation operation_id={s.operation_id} company_id={s.company_id} status={s.status} " \
-               "category={s.category} currency={s.currency} amount={s.amount} " \
-               "amount_with_commission={s.amount_with_commission} account_number={s.account_number} " \
-               "purpose={s.purpose} executed={s.executed} created={s.created} doc_number={s.doc_number} " \
-               "contractor:{s.contractor}{budgetary_and_tax}>" \
-            .format(s=self,
-                    budgetary_and_tax=self.budgetary_and_tax and "budgetary_and_tax:" + str(
-                        self.budgetary_and_tax) or '')
+        return ('<%s ' % self.__class__.__name__) + ' '.join(
+            ['%s:%s' % (k.replace('_' + self.__class__.__name__, '').lstrip('_'), str(self.__dict__[k]))
+             for k in self.__dict__]) + '>'
 
     @property
     def operation_id(self) -> str:
@@ -943,15 +900,15 @@ class NotifyRequest:
 
         :param dict obj: JSON-объект уведомления о произошедшей транзакции из API МодульБанка.
         """
-        self.__inn = 'companyInn' in obj and obj['companyInn'] or ''
-        self.__kpp = 'contragentKpp' in obj and obj['contragentKpp'] or ''
-        if 'operation' in obj:
-            self.__operation = Operation(obj['operation'])
-        if 'SHA1Hash' in obj:
-            self.__signature = obj['SHA1Hash']
+        self.__inn = obj.get('companyInn', '')
+        self.__kpp = obj.get('contragentKpp', '')
+        self.__operation = Operation(obj.get('operation'))
+        self.__signature = obj.get('SHA1Hash')
 
     def __str__(self):
-        return "<NotifyRequest inn={s.inn} kpp={s.kpp} operation:{s.operation} signature={s.signature}>".format(s=self)
+        return ('<%s ' % self.__class__.__name__) + ' '.join(
+            ['%s:%s' % (k.replace('_' + self.__class__.__name__, '').lstrip('_'), str(self.__dict__[k]))
+             for k in self.__dict__]) + '>'
 
     @property
     def inn(self) -> str:

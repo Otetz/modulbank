@@ -74,7 +74,7 @@ def test_operation(client: ModulbankClient):
         m.post("https://api.modulbank.ru/v1/operation-history/{id}".format(id=account_id),
                json=json_from_file('operations.json'),
                headers={'Content-Type': 'application/json; charset=utf-8'})
-        res = client.operations(account_id, SearchOptions())
+        res = client.operations(account_id)
     assert isinstance(res, list)
     assert len(res) > 0
     assert isinstance(res[0], Operation)
@@ -135,6 +135,20 @@ def test_operation_page():
         res = client.operations(account_id, SearchOptions(page=1))
         assert isinstance(res, list)
         assert len(res) == 5
+
+
+# noinspection PyShadowingNames
+def test_operation_wo_page(client: ModulbankClient):
+    account_id = '58c20343-5d3b-422c-b98b-a5ec037df782'
+    with requests_mock.Mocker() as m:
+        m.post("https://api.modulbank.ru/v1/operation-history/{id}".format(id=account_id),
+               json=json_from_file('operations_from.json'),
+               headers={'Content-Type': 'application/json; charset=utf-8'})
+        # noinspection PyTypeChecker
+        res = client.operations(account_id, SearchOptions(page=None))
+    assert isinstance(res, list)
+    assert len(res) > 0
+    assert isinstance(res[0], Operation)
 
 
 # noinspection PyShadowingNames

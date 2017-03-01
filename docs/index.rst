@@ -6,7 +6,7 @@
 Welcome to modulbank's documentation!
 =====================================
 
-.. include:: ../README
+.. include:: ../README.rst
 
 .. toctree::
    :maxdepth: 4

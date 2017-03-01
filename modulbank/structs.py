@@ -18,11 +18,11 @@ class Company:
     Компания, в которой состоит пользователь МодульБанка.
     """
 
-    def __init__(self, obj: {}):
+    def __init__(self, obj: dict):
         """
         Конструктор
 
-        :param obj: JSON-объект компании из API МодульБанка.
+        :param dict obj: JSON-объект компании из API МодульБанка.
         """
         if 'companyId' in obj:
             self.__company_id = obj['companyId']
@@ -70,11 +70,11 @@ class Bank:
     Реквизиты банка (из платежных реквизитов организации).
     """
 
-    def __init__(self, obj: {}):
+    def __init__(self, obj: dict):
         """
         Конструктор
 
-        :param obj: JSON-объект банковского счёта (!) из API МодульБанка.
+        :param dict obj: JSON-объект банковского счёта (!) из API МодульБанка.
         """
         if 'bankBic' in obj:
             self.__bic = obj['bankBic']
@@ -146,11 +146,11 @@ class BankAccount:
     Счёт компании-пользователя МодульБанка.
     """
 
-    def __init__(self, obj: {}):
+    def __init__(self, obj: dict):
         """
         Конструктор
 
-        :param obj: JSON-объект банковского счёта из API МодульБанка.
+        :param dict obj: JSON-объект банковского счёта из API МодульБанка.
         """
         if 'id' in obj:
             self.__account_id = obj['id']
@@ -314,14 +314,14 @@ class BankShort:
     Номер счета, Название банка, БИК и корр. счёт.
     """
 
-    def __init__(self, account=None, name=None, bic=None, corr_acc=None):
+    def __init__(self, account: str = None, name: str = None, bic: str = None, corr_acc: str = None):
         """
         Конструктор
 
-        :param account: Номер счета
-        :param name: Название банка
-        :param bic: БИК
-        :param corr_acc: Корр. счёт
+        :param str account: Номер счета
+        :param str name: Название банка
+        :param str bic: БИК
+        :param str corr_acc: Корр. счёт
         """
         self.__account = account
         self.__name = name
@@ -379,15 +379,15 @@ class Contractor:
     Контрагент в операции.
     """
 
-    def __init__(self, obj: dict = None, name=None, inn=None, kpp=None, bank=None):
+    def __init__(self, obj: dict = None, name: str = None, inn: str = None, kpp: str = None, bank: BankShort = None):
         """
         Конструктор
 
-        :param obj: JSON-объект операции по счёту из API МодульБанка.
-        :param name:
-        :param inn:
-        :param kpp:
-        :param bank:
+        :param dict obj: JSON-объект операции по счёту из API МодульБанка.
+        :param str name:
+        :param str inn:
+        :param str kpp:
+        :param BankShort bank:
         """
         if obj:
             if 'contragentName' in obj:
@@ -437,7 +437,7 @@ class Contractor:
         :return: КПП контрагента
         :rtype: str
         """
-        return self.__kpp or '0'
+        return self.__kpp
 
     @property
     def bank(self) -> BankShort:
@@ -455,11 +455,11 @@ class BudgetaryAndTax:
     Параметры бюджетных и налоговых платежей в операции.
     """
 
-    def __init__(self, obj: {}):
+    def __init__(self, obj: dict):
         """
         Конструктор
 
-        :param obj: JSON-объект операции по счёту из API МодульБанка.
+        :param dict obj: JSON-объект операции по счёту из API МодульБанка.
         """
         if 'kbk' in obj:
             self.__kbk = obj['kbk']
@@ -576,11 +576,11 @@ class Operation:
     Операция по счёту
     """
 
-    def __init__(self, obj: {}):
+    def __init__(self, obj: dict):
         """
         Конструктор
 
-        :param obj: JSON-объект операции по счёту из API МодульБанка.
+        :param dict obj: JSON-объект операции по счёту из API МодульБанка.
         """
         if 'id' in obj:
             self.__operation_id = obj['id']
@@ -625,7 +625,10 @@ class Operation:
             try:
                 self.__created = datetime.datetime.strptime(obj['created'], '%Y-%m-%dT%H:%M:%S')
             except ValueError:
-                raise UnexpectedValueModulbankException('Created %s as datetime.datetime' % obj['created'])
+                try:
+                    self.__created = datetime.datetime.strptime(obj['created'], '%Y-%m-%dT%H:%M:%S.%f')
+                except ValueError:
+                    raise UnexpectedValueModulbankException('Created %s as datetime.datetime' % obj['created'])
         if 'docNumber' in obj:
             self.__doc_number = obj['docNumber']
         if 'contragentName' in obj or 'contragentInn' in obj or 'contragentKpp' in obj \
@@ -818,15 +821,15 @@ class PaymentOrder:
         """
         Конструктор
 
-        :param doc_num: Номер документа
-        :param account_num: Расчетный счет организации
-        :param amount: Сумма платежа
-        :param purpose: Назначение платежа одной строкой
-        :param payer: Плательщик :class:`Contractor` и его реквизиты
-        :param recipient: Получатель :class:`Contractor` и его реквизиты
-        :param payment_type: (опционально) Вид оплаты (вид операции). Для платежных поручений всегда 01
-        :param priority: (опционально) Очередность платежа. Для обычных операций всегда 5
-        :param date: (опционально) Дата списания средств с р/c. По умолчанию сегодняшнее число
+        :param str doc_num: Номер документа
+        :param str account_num: Расчетный счет организации
+        :param Decimal amount: Сумма платежа
+        :param str purpose: Назначение платежа одной строкой
+        :param Contractor payer: Плательщик :class:`Contractor` и его реквизиты
+        :param Contractor recipient: Получатель :class:`Contractor` и его реквизиты
+        :param str payment_type: (опционально) Вид оплаты (вид операции). Для платежных поручений всегда 01
+        :param str priority: (опционально) Очередность платежа. Для обычных операций всегда 5
+        :param datetime.date date: (опционально) Дата списания средств с р/c. По умолчанию сегодняшнее число
         """
         self.__doc_num = doc_num
         self.__account_num = account_num
@@ -938,7 +941,7 @@ class NotifyRequest:
         """
         Конструктор
 
-        :param obj: JSON-объект уведомления о произошедшей транзакции из API МодульБанка.
+        :param dict obj: JSON-объект уведомления о произошедшей транзакции из API МодульБанка.
         """
         self.__inn = 'companyInn' in obj and obj['companyInn'] or ''
         self.__kpp = 'contragentKpp' in obj and obj['contragentKpp'] or ''

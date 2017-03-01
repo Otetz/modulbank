@@ -101,11 +101,12 @@ class PaymentResponse:
     незагруженным платёжным поручениям при их наличии
     """
 
-    def __init__(self, obj: {}):
+    def __init__(self, obj: dict, document: str = None):
         """
         Конструктор
 
-        :param obj: JSON-объект ответа на импорт платежек в API МодульБанка.
+        :param dict obj: JSON-объект ответа на импорт платежек в API МодульБанка.
+        :param str document: Платёжное поручение в формате 1CClientBankExchange
         """
         if 'totalLoaded' in obj:
             self.__total_loaded = obj['totalLoaded']
@@ -113,6 +114,7 @@ class PaymentResponse:
             self.__errors = obj['errors']
         else:
             self.__errors = []
+        self.__document = document
 
     @property
     def total_loaded(self) -> int:
@@ -133,6 +135,16 @@ class PaymentResponse:
         :rtype: list(str)
         """
         return self.__errors
+
+    @property
+    def document(self) -> str:
+        """
+        Платёжное поручение в формате 1CClientBankExchange
+
+        :return: Документ, отправленный в API МодульБанка
+        :rtype: str
+        """
+        return self.__document
 
 
 class ModulbankClient:
@@ -285,7 +297,6 @@ class ModulbankClient:
         :raises UnexpectedResponseBodyModulbankException: Если не удалось обработать полученные данные.
         """
         exchange = ClientBankExchange()
-        # noinspection PyTypeChecker
         self.__fill_client_bank_exchange(order, exchange)
         r = requests.post(self._api_url + 'operation-upload/1c', json={"document": exchange.document},
                           headers=self.__headers)
@@ -294,37 +305,42 @@ class ModulbankClient:
         if r.status_code != 200:
             raise UnexpectedResponseStatusModulbankException(r.status_code)
         try:
-            res = PaymentResponse(r.json())
+            res = PaymentResponse(r.json(), document=exchange.document)
         except ValueError:
             raise UnexpectedResponseBodyModulbankException(r.text)
         return res
 
     @staticmethod
-    def __fill_client_bank_exchange(order, exchange):
+    def __fill_client_bank_exchange(order: PaymentOrder, exchange: ClientBankExchange) -> None:
         """
         Заполнение полей платежного поручения
 
         :param PaymentOrder order: Объект платёжного поручения
         :param ClientBankExchange exchange: Объект обмена данными в формате 1С
+        :return: None
+        :rtype: None
         """
         exchange.УсловияОтбора.РасчСчет = order.account_num
         exchange.СекцияПлатежногоДокумента.Номер = order.doc_num
         exchange.СекцияПлатежногоДокумента.Дата = order.date
         exchange.СекцияПлатежногоДокумента.Сумма = order.amount
         exchange.СекцияПлатежногоДокумента.НазначениеПлатежа = order.purpose
+        exchange.СекцияПлатежногоДокумента.НазначениеПлатежа1 = order.purpose
 
-        exchange.СекцияПлатежногоДокумента.Плательщик1 = order.payer.name
+        exchange.СекцияПлатежногоДокумента.Плательщик = "%s %s" % (order.payer.inn, order.payer.name)
         exchange.СекцияПлатежногоДокумента.ПлательщикИНН = order.payer.inn
         exchange.СекцияПлатежногоДокумента.ПлательщикКПП = order.payer.kpp
         exchange.СекцияПлатежногоДокумента.ПлательщикСчет = order.payer.bank.account
+        exchange.СекцияПлатежногоДокумента.ПлательщикРасчСчет = order.payer.bank.account
         exchange.СекцияПлатежногоДокумента.ПлательщикБанк1 = order.payer.bank.name
         exchange.СекцияПлатежногоДокумента.ПлательщикБИК = order.payer.bank.bic
         exchange.СекцияПлатежногоДокумента.ПлательщикКорсчет = order.payer.bank.corr_acc
 
-        exchange.СекцияПлатежногоДокумента.Получатель1 = order.recipient.name
+        exchange.СекцияПлатежногоДокумента.Получатель = order.recipient.name
         exchange.СекцияПлатежногоДокумента.ПолучательИНН = order.recipient.inn
         exchange.СекцияПлатежногоДокумента.ПолучательКПП = order.recipient.kpp
         exchange.СекцияПлатежногоДокумента.ПолучательСчет = order.recipient.bank.account
+        exchange.СекцияПлатежногоДокумента.ПолучательРасчСчет = order.recipient.bank.account
         exchange.СекцияПлатежногоДокумента.ПолучательБанк1 = order.recipient.bank.name
         exchange.СекцияПлатежногоДокумента.ПолучательБИК = order.recipient.bank.bic
         exchange.СекцияПлатежногоДокумента.ПолучательКорсчет = order.recipient.bank.corr_acc

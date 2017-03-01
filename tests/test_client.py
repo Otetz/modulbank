@@ -177,6 +177,8 @@ def test_create_payment_draft(client):
     assert len(res.errors) == 0
     assert isinstance(res.total_loaded, int)
     assert res.total_loaded == 1
+    assert isinstance(res.document, str)
+    assert len(res.document) > 100
 
 
 def test_company_str():

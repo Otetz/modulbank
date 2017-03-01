@@ -437,7 +437,7 @@ class Contractor:
         :return: КПП контрагента
         :rtype: str
         """
-        return self.__kpp or '0'
+        return self.__kpp
 
     @property
     def bank(self) -> BankShort:
@@ -625,7 +625,10 @@ class Operation:
             try:
                 self.__created = datetime.datetime.strptime(obj['created'], '%Y-%m-%dT%H:%M:%S')
             except ValueError:
-                raise UnexpectedValueModulbankException('Created %s as datetime.datetime' % obj['created'])
+                try:
+                    self.__created = datetime.datetime.strptime(obj['created'], '%Y-%m-%dT%H:%M:%S.%f')
+                except ValueError:
+                    raise UnexpectedValueModulbankException('Created %s as datetime.datetime' % obj['created'])
         if 'docNumber' in obj:
             self.__doc_number = obj['docNumber']
         if 'contragentName' in obj or 'contragentInn' in obj or 'contragentKpp' in obj \

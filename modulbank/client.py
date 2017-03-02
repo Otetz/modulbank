@@ -1,11 +1,14 @@
 import datetime
 from decimal import Decimal, InvalidOperation
 
+import logging
 import requests
 
 from .client_bank_exchange import ClientBankExchange
 from .exceptions import *
 from .structs import Company, Operation, OperationCategory, PaymentOrder
+
+log = logging.getLogger(__name__)
 
 
 class SearchOptions:

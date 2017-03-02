@@ -47,7 +47,7 @@ class BaseSection:
             return value.strftime('%H:%M:%S')
         if isinstance(value, Decimal):
             return str(value.quantize(Decimal('.01'), rounding=ROUND_HALF_DOWN))
-        return ''
+        return value
 
 
 class GeneralSection(BaseSection):

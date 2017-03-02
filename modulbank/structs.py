@@ -798,6 +798,11 @@ class PaymentOrder:
         self.__priority = priority
         self.__date = date is not None and date or datetime.date.today()
 
+    def __str__(self):
+        return ('<%s ' % self.__class__.__name__) + ' '.join(
+            ['%s:%s' % (k.replace('_' + self.__class__.__name__, '').lstrip('_'), str(self.__dict__[k]))
+             for k in self.__dict__]) + '>'
+
     @property
     def doc_num(self) -> str:
         """

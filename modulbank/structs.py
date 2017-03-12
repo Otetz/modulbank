@@ -3,6 +3,8 @@ import hashlib
 from decimal import Decimal, InvalidOperation
 from enum import Enum
 
+import pytz
+
 from .exceptions import UnexpectedValueModulbankException
 
 AccountCategory = Enum('AccountCategory',
@@ -584,16 +586,16 @@ class Operation:
         self.__purpose = obj.get('paymentPurpose')
         try:
             self.__executed = obj.get('executed') and datetime.datetime.strptime(obj.get('executed'),
-                                                                                 '%Y-%m-%dT%H:%M:%S') or None
+                                                                                 '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.timezone('Europe/Moscow')) or None
         except ValueError:
             raise UnexpectedValueModulbankException('Executed %s as datetime.datetime' % obj.get('executed'))
         try:
             self.__created = obj.get('created') and datetime.datetime.strptime(obj.get('created'),
-                                                                               '%Y-%m-%dT%H:%M:%S') or None
+                                                                               '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.timezone('Europe/Moscow')) or None
         except ValueError:
             try:
                 self.__created = obj.get('created') and datetime.datetime.strptime(obj.get('created'),
-                                                                                   '%Y-%m-%dT%H:%M:%S.%f') or None
+                                                                                   '%Y-%m-%dT%H:%M:%S.%f').replace(tzinfo=pytz.timezone('Europe/Moscow')) or None
             except ValueError:
                 raise UnexpectedValueModulbankException('Created %s as datetime.datetime' % obj.get('created'))
         self.__doc_number = obj.get('docNumber')

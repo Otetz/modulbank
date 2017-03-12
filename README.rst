@@ -28,9 +28,10 @@ Install modulbank package from `PyPI <https://pypi.python.org/pypi>`_
 Getting started
 ---------------
 
-Make sure to include this line in the beginning of your code::
+Make sure to include this lines in the beginning of your code::
 
-  from modulbank import *
+  from modulbank.client import ModulbankClient
+  import modulbank.structs as structs
 
 Set your *API Token* and choose *sandbox mode* ``on`` or ``off``::
 
@@ -44,17 +45,18 @@ Make queries::
 
 Or send payment order::
 
-  p = PaymentOrder(doc_num='994720', account_num='40802810670010011008', amount=Decimal(100.00), purpose='Для теста',
-                   payer=Contractor(name='Индивидуальный предприниматель Александров Александр Александрович',
-                                    inn='770400372208',
-                                    bank=BankShort(account='40802810670010011008',
-                                                   name='МОСКОВСКИЙ ФИЛИАЛ АО КБ "МОДУЛЬБАНК"',
-                                                   bic='044525092', corr_acc='30101810645250000092')),
-                   recipient=Contractor(name='МОСКОВСКИЙ ФИЛИАЛ АО КБ "МОДУЛЬБАНК"',
-                                        inn='2204000595', kpp='771543001',
-                                        bank=BankShort(account='30102810675250000092',
-                                                       name='МОСКОВСКИЙ ФИЛИАЛ АО КБ "МОДУЛЬБАНК"',
-                                                       bic='044525092', corr_acc='30102810675250000092')))
+  p = structs.PaymentOrder(
+      doc_num='994720', account_num='40802810670010011008', amount=Decimal(100.00), purpose='Для теста',
+      payer=structs.Contractor(name='Индивидуальный предприниматель Александров Александр Александрович',
+                               inn='770400372208', kpp='',
+                               bank=structs.BankShort(account='40802810670010011008',
+                                                      name='МОСКОВСКИЙ ФИЛИАЛ АО КБ "МОДУЛЬБАНК"',
+                                                      bic='044525092', corr_acc='30101810645250000092')),
+      recipient=structs.Contractor(name='МОСКОВСКИЙ ФИЛИАЛ АО КБ "МОДУЛЬБАНК"',
+                                   inn='2204000595', kpp='771543001',
+                                   bank=structs.BankShort(account='30102810675250000092',
+                                                          name='МОСКОВСКИЙ ФИЛИАЛ АО КБ "МОДУЛЬБАНК"',
+                                                          bic='044525092', corr_acc='30102810675250000092')))
   res = client.create_payment_draft(p)
   assert len(res.errors) == 0
   assert res.total_loaded == 1
@@ -71,7 +73,7 @@ Sample usage of class ``NotifyRequest``::
     if not request.is_json:
         return make_response(render_template('template.json'), 400)
 
-    nr = NotifyRequest(request.json)
+    nr = structs.NotifyRequest(request.json)
 
     # Filter only needed company's operations
     if nr.inn != INN or nr.kpp != KPP:

@@ -2,6 +2,8 @@ import datetime
 
 from decimal import Decimal, ROUND_HALF_DOWN
 
+import pytz
+
 
 class BaseSection:
     """
@@ -67,7 +69,7 @@ class GeneralSection(BaseSection):
         self.__dict__['Кодировка'] = 'Windows'
         self.__dict__['Отправитель'] = 'modulbank_python'
         self.__dict__['ДатаСоздания'] = datetime.date.today()
-        self.__dict__['ВремяСоздания'] = datetime.datetime.now().time()
+        self.__dict__['ВремяСоздания'] = datetime.datetime.now().replace(tzinfo=pytz.timezone('Europe/Moscow')).time()
 
 
 class FilterSection(BaseSection):

@@ -5,7 +5,7 @@ import logging
 import requests
 
 from .client_bank_exchange import ClientBankExchange
-from .exceptions import *
+from . import exceptions
 from .structs import Company, Operation, OperationCategory, PaymentOrder
 
 log = logging.getLogger(__name__)
@@ -202,13 +202,13 @@ class ModulbankClient:
         """
         r = requests.post(self._api_url + 'account-info', json={}, headers=self.__headers)
         if r.status_code == 401:
-            raise NotAuthorizedModulbankException()
+            raise exceptions.NotAuthorizedModulbankException()
         if r.status_code != 200:
-            raise UnexpectedResponseStatusModulbankException(r.status_code)
+            raise exceptions.UnexpectedResponseStatusModulbankException(r.status_code)
         try:
             res = [Company(x) for x in r.json()]
         except ValueError:
-            raise UnexpectedResponseBodyModulbankException(r.text)
+            raise exceptions.UnexpectedResponseBodyModulbankException(r.text)
         return res
 
     def balance(self, account_id: str) -> Decimal:
@@ -227,13 +227,13 @@ class ModulbankClient:
         r = requests.post(self._api_url + 'account-info/balance/{id}'.format(id=account_id), json={},
                           headers=self.__headers)
         if r.status_code == 401:
-            raise NotAuthorizedModulbankException()
+            raise exceptions.NotAuthorizedModulbankException()
         if r.status_code != 200:
-            raise UnexpectedResponseStatusModulbankException(r.status_code)
+            raise exceptions.UnexpectedResponseStatusModulbankException(r.status_code)
         try:
             res = Decimal(r.text)
         except InvalidOperation:
-            raise UnexpectedValueModulbankException('Balance %s as Decimal' % r.text)
+            raise exceptions.UnexpectedValueModulbankException('Balance %s as Decimal' % r.text)
         return res
 
     def operations(self, account_id: str, search: SearchOptions = None) -> list:
@@ -257,13 +257,13 @@ class ModulbankClient:
                           json=criteria,
                           headers=self.__headers)
         if r.status_code == 401:
-            raise NotAuthorizedModulbankException()
+            raise exceptions.NotAuthorizedModulbankException()
         if r.status_code != 200:
-            raise UnexpectedResponseStatusModulbankException(r.status_code)
+            raise exceptions.UnexpectedResponseStatusModulbankException(r.status_code)
         try:
             res = [Operation(x) for x in r.json()]
         except ValueError:
-            raise UnexpectedResponseBodyModulbankException(r.text)
+            raise exceptions.UnexpectedResponseBodyModulbankException(r.text)
         return res
 
     def __patch_paging(self, param: dict):
@@ -304,13 +304,13 @@ class ModulbankClient:
         r = requests.post(self._api_url + 'operation-upload/1c', json={"document": exchange.document},
                           headers=self.__headers)
         if r.status_code == 401:
-            raise NotAuthorizedModulbankException()
+            raise exceptions.NotAuthorizedModulbankException()
         if r.status_code != 200:
-            raise UnexpectedResponseStatusModulbankException(r.status_code)
+            raise exceptions.UnexpectedResponseStatusModulbankException(r.status_code)
         try:
             res = PaymentResponse(r.json(), document=exchange.document)
         except ValueError:
-            raise UnexpectedResponseBodyModulbankException(r.text)
+            raise exceptions.UnexpectedResponseBodyModulbankException(r.text)
         return res
 
     @staticmethod

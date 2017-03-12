@@ -157,7 +157,8 @@ class BankAccount:
         except InvalidOperation:
             raise UnexpectedValueModulbankException('Balance %s as Decimal' % obj.get('balance'))
         try:
-            self.__begin_date = datetime.datetime.strptime(obj.get('beginDate'), '%Y-%m-%dT%H:%M:%S').date()
+            self.__begin_date = obj.get('beginDate') and datetime.datetime.strptime(obj.get('beginDate'),
+                                                                                    '%Y-%m-%dT%H:%M:%S').date() or None
         except ValueError:
             raise UnexpectedValueModulbankException('BeginDate %s as datetime.date' % obj.get('beginDate'))
         try:
@@ -582,14 +583,17 @@ class Operation:
         self.__account_number = obj.get('bankAccountNumber')
         self.__purpose = obj.get('paymentPurpose')
         try:
-            self.__executed = datetime.datetime.strptime(obj.get('executed'), '%Y-%m-%dT%H:%M:%S')
+            self.__executed = obj.get('executed') and datetime.datetime.strptime(obj.get('executed'),
+                                                                                 '%Y-%m-%dT%H:%M:%S') or None
         except ValueError:
             raise UnexpectedValueModulbankException('Executed %s as datetime.datetime' % obj.get('executed'))
         try:
-            self.__created = datetime.datetime.strptime(obj.get('created'), '%Y-%m-%dT%H:%M:%S')
+            self.__created = obj.get('created') and datetime.datetime.strptime(obj.get('created'),
+                                                                               '%Y-%m-%dT%H:%M:%S') or None
         except ValueError:
             try:
-                self.__created = datetime.datetime.strptime(obj.get('created'), '%Y-%m-%dT%H:%M:%S.%f')
+                self.__created = obj.get('created') and datetime.datetime.strptime(obj.get('created'),
+                                                                                   '%Y-%m-%dT%H:%M:%S.%f') or None
             except ValueError:
                 raise UnexpectedValueModulbankException('Created %s as datetime.datetime' % obj.get('created'))
         self.__doc_number = obj.get('docNumber')

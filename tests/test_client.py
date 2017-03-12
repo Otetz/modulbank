@@ -1,10 +1,14 @@
 import json
 import os
 
+import datetime
 import pytest
 import requests_mock
+from decimal import Decimal
 
-from modulbank import *
+from modulbank.client import ModulbankClient, SearchOptions
+from modulbank.client_bank_exchange import ClientBankExchange
+import modulbank.structs as structs
 
 
 @pytest.fixture
@@ -33,7 +37,7 @@ def test_accounts(client: ModulbankClient):
         res = client.accounts()
     assert isinstance(res, list)
     assert len(res) > 0
-    assert isinstance(res[0], Company)
+    assert isinstance(res[0], structs.Company)
     assert res[0].name == 'ООО "Ромашка"'
     assert res[0].company_id == '70ca00f6-1f10-4964-aca6-a5ec032efe37'
     assert isinstance(res[0].bank_accounts, list)
@@ -42,11 +46,11 @@ def test_accounts(client: ModulbankClient):
     assert res[0].bank_accounts[0].account_id == 'edb10116-5a93-4963-a53b-a5ec037177f0'
     assert res[0].bank_accounts[0].balance == Decimal(900000)
     assert res[0].bank_accounts[0].begin_date == datetime.date(2015, 10, 7)
-    assert res[0].bank_accounts[0].category == AccountCategory.CheckingAccount
-    assert res[0].bank_accounts[0].currency == Currency.RUR
+    assert res[0].bank_accounts[0].category == structs.AccountCategory.CheckingAccount
+    assert res[0].bank_accounts[0].currency == structs.Currency.RUR
     assert res[0].bank_accounts[0].number == '40802810070000000001'
-    assert res[0].bank_accounts[0].status == AccountStatus.New
-    assert isinstance(res[0].bank_accounts[0].bank, Bank)
+    assert res[0].bank_accounts[0].status == structs.AccountStatus.New
+    assert isinstance(res[0].bank_accounts[0].bank, structs.Bank)
     assert res[0].bank_accounts[0].bank.bic == '044525092'
     assert res[0].bank_accounts[0].bank.inn == '2204000595'
     assert res[0].bank_accounts[0].bank.kpp == '770443001'
@@ -77,10 +81,10 @@ def test_operation(client: ModulbankClient):
         res = client.operations(account_id)
     assert isinstance(res, list)
     assert len(res) > 0
-    assert isinstance(res[0], Operation)
-    assert res[0].status == OperationStatus.Received
-    assert res[0].category == OperationCategory.Debet
-    assert res[0].currency == Currency.RUR
+    assert isinstance(res[0], structs.Operation)
+    assert res[0].status == structs.OperationStatus.Received
+    assert res[0].category == structs.OperationCategory.Debet
+    assert res[0].currency == structs.Currency.RUR
     assert isinstance(res[0].amount, Decimal)
     assert res[0].amount == Decimal(100000)
     assert isinstance(res[0].amount_with_commission, Decimal)
@@ -88,7 +92,7 @@ def test_operation(client: ModulbankClient):
     assert res[0].account_number == '30101810000000000001'
     assert isinstance(res[0].executed, datetime.datetime)
     assert isinstance(res[0].created, datetime.datetime)
-    assert isinstance(res[0].contractor, Contractor)
+    assert isinstance(res[0].contractor, structs.Contractor)
     assert res[0].budgetary_and_tax is None
 
 
@@ -102,7 +106,7 @@ def test_operation_from(client: ModulbankClient):
         res = client.operations(account_id, SearchOptions(date_from=datetime.date(2016, 4, 1)))
     assert isinstance(res, list)
     assert len(res) > 0
-    assert isinstance(res[0], Operation)
+    assert isinstance(res[0], structs.Operation)
 
 
 # noinspection PyShadowingNames
@@ -115,7 +119,7 @@ def test_operation_till(client: ModulbankClient):
         res = client.operations(account_id, SearchOptions(date_till=datetime.date(2016, 4, 1)))
     assert isinstance(res, list)
     assert len(res) > 0
-    assert isinstance(res[0], Operation)
+    assert isinstance(res[0], structs.Operation)
 
 
 # noinspection PyShadowingNames
@@ -148,7 +152,7 @@ def test_operation_wo_page(client: ModulbankClient):
         res = client.operations(account_id, SearchOptions(page=None))
     assert isinstance(res, list)
     assert len(res) > 0
-    assert isinstance(res[0], Operation)
+    assert isinstance(res[0], structs.Operation)
 
 
 # noinspection PyShadowingNames
@@ -158,30 +162,30 @@ def test_operation_category(client: ModulbankClient):
         m.post("https://api.modulbank.ru/v1/operation-history/{id}".format(id=account_id),
                json=json_from_file('operations_category_debet.json'),
                headers={'Content-Type': 'application/json; charset=utf-8'})
-        res = client.operations(account_id, SearchOptions(category=OperationCategory.Debet))
+        res = client.operations(account_id, SearchOptions(category=structs.OperationCategory.Debet))
         assert isinstance(res, list)
         assert len(res) > 0
         m.post("https://api.modulbank.ru/v1/operation-history/{id}".format(id=account_id),
                json=json_from_file('operations_category_credit.json'),
                headers={'Content-Type': 'application/json; charset=utf-8'})
-        res = client.operations(account_id, SearchOptions(category=OperationCategory.Credit))
+        res = client.operations(account_id, SearchOptions(category=structs.OperationCategory.Credit))
         assert isinstance(res, list)
         assert len(res) == 0
 
 
 # noinspection PyShadowingNames
 def test_create_payment_draft(client):
-    p = PaymentOrder(doc_num='994720', account_num='40802810670010011008', amount=Decimal(100.00), purpose='Для теста',
-                     payer=Contractor(name='Индивидуальный предприниматель Александров Александр Александрович',
-                                      inn='770400372208',
-                                      bank=BankShort(account='40802810670010011008',
-                                                     name='МОСКОВСКИЙ ФИЛИАЛ АО КБ \"МОДУЛЬБАНК\"',
-                                                     bic='044525092', corr_acc='30101810645250000092')),
-                     recipient=Contractor(name='МОСКОВСКИЙ ФИЛИАЛ АО КБ \"МОДУЛЬБАНК\"',
-                                          inn='2204000595', kpp='771543001',
-                                          bank=BankShort(account='30102810675250000092',
-                                                         name='МОСКОВСКИЙ ФИЛИАЛ АО КБ \"МОДУЛЬБАНК\"',
-                                                         bic='044525092', corr_acc='30102810675250000092')))
+    p = structs.PaymentOrder(
+        doc_num='994720', account_num='40802810670010011008', amount=Decimal(100.00), purpose='Для теста',
+        payer=structs.Contractor(name='Индивидуальный предприниматель Александров Александр Александрович',
+                                 inn='770400372208',
+                                 bank=structs.BankShort(account='40802810670010011008',
+                                                        name='МОСКОВСКИЙ ФИЛИАЛ АО КБ \"МОДУЛЬБАНК\"',
+                                                        bic='044525092', corr_acc='30101810645250000092')),
+        recipient=structs.Contractor(name='МОСКОВСКИЙ ФИЛИАЛ АО КБ \"МОДУЛЬБАНК\"', inn='2204000595', kpp='771543001',
+                                     bank=structs.BankShort(account='30102810675250000092',
+                                                            name='МОСКОВСКИЙ ФИЛИАЛ АО КБ \"МОДУЛЬБАНК\"',
+                                                            bic='044525092', corr_acc='30102810675250000092')))
     with requests_mock.Mocker() as m:
         m.post("https://api.modulbank.ru/v1/operation-upload/1c",
                json=json_from_file('operation_upload.json'),
@@ -197,37 +201,37 @@ def test_create_payment_draft(client):
 
 def test_company_str():
     data = json_from_file('accounts.json')
-    c = Company(data[0])
+    c = structs.Company(data[0])
     assert str(c).startswith('<Company ')
 
 
 def test_bank_str():
     data = json_from_file('accounts.json')
-    c = Bank(data[0]['bankAccounts'][0])
+    c = structs.Bank(data[0]['bankAccounts'][0])
     assert str(c).startswith('<Bank ')
 
 
 def test_bank_account_str():
     data = json_from_file('accounts.json')
-    c = BankAccount(data[0]['bankAccounts'][0])
+    c = structs.BankAccount(data[0]['bankAccounts'][0])
     assert str(c).startswith('<BankAccount ')
 
 
 def test_bank_short_str():
     data = json_from_file('operations.json')
-    c = Contractor(data[0])
+    c = structs.Contractor(data[0])
     assert str(c.bank).startswith('<BankShort ')
 
 
 def test_contractor_str():
     data = json_from_file('operations.json')
-    c = Contractor(data[0])
+    c = structs.Contractor(data[0])
     assert str(c).startswith('<Contractor ')
 
 
 def test_operation_str():
     data = json_from_file('operations.json')
-    c = Operation(data[0])
+    c = structs.Operation(data[0])
     assert str(c).startswith('<Operation ')
 
 
@@ -240,7 +244,7 @@ def test_client_bank_exchange_str():
 # noinspection PyShadowingNames
 def test_notify_request(client: ModulbankClient):
     data = json_from_file('new_operations.json')
-    nr = NotifyRequest(data)
+    nr = structs.NotifyRequest(data)
     assert nr.inn == '1111111111'
     assert nr.kpp == ''
     assert nr.check_signature(client.token)
@@ -248,5 +252,5 @@ def test_notify_request(client: ModulbankClient):
 
 def test_notify_request_str():
     data = json_from_file('new_operations.json')
-    nr = NotifyRequest(data)
+    nr = structs.NotifyRequest(data)
     assert str(nr).startswith('<NotifyRequest ')

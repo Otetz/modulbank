@@ -48,6 +48,7 @@ class BaseSection:
         if isinstance(value, datetime.time):
             return value.strftime('%H:%M:%S')
         if isinstance(value, Decimal):
+            # noinspection PyArgumentList
             return str(value.quantize(Decimal('.01'), rounding=ROUND_HALF_DOWN))
         return value
 

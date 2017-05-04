@@ -7,11 +7,16 @@ import pytz
 
 from .exceptions import UnexpectedValueModulbankException
 
+# noinspection PyArgumentList
 AccountCategory = Enum('AccountCategory',
                        'CheckingAccount DepositAccount CardAccount DepositRateAccount ReservationAccounting')
+# noinspection PyArgumentList
 Currency = Enum('Currency', 'RUR USD EUR CNY')
+# noinspection PyArgumentList
 AccountStatus = Enum('AccountStatus', 'New Deleted Closed Freezed ToClosed ToOpen')
+# noinspection PyArgumentList
 OperationStatus = Enum('OperationStatus', 'SendToBank Executed RejectByBank Canceled Received')
+# noinspection PyArgumentList
 OperationCategory = Enum('OperationCategory', 'Debet Credit')
 
 
@@ -577,11 +582,14 @@ class Operation:
             self.__amount = Decimal(obj.get('amount'))
         except InvalidOperation:
             raise UnexpectedValueModulbankException('Amount %s as Decimal' % obj.get('amount'))
-        try:
-            self.__amount_with_commission = Decimal(obj.get('amountWithCommission'))
-        except InvalidOperation:
-            raise UnexpectedValueModulbankException(
-                'AmountWithCommission %s as Decimal' % obj.get('amountWithCommission'))
+        if obj.get('amountWithCommission') is None:
+            self.__amount_with_commission = None
+        else:
+            try:
+                self.__amount_with_commission = Decimal(obj.get('amountWithCommission'))
+            except InvalidOperation:
+                raise UnexpectedValueModulbankException(
+                    'AmountWithCommission %s as Decimal' % obj.get('amountWithCommission'))
         self.__account_number = obj.get('bankAccountNumber')
         self.__purpose = obj.get('paymentPurpose')
         try:

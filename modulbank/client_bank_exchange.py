@@ -66,11 +66,12 @@ class GeneralSection(BaseSection):
         for name in self._fields:
             self.__dict__[name] = None
 
+        moscow_tz = pytz.timezone('Europe/Moscow')
         self.__dict__['ВерсияФормата'] = '1.02'
         self.__dict__['Кодировка'] = 'Windows'
         self.__dict__['Отправитель'] = 'modulbank_python'
         self.__dict__['ДатаСоздания'] = datetime.date.today()
-        self.__dict__['ВремяСоздания'] = datetime.datetime.now().replace(tzinfo=pytz.timezone('Europe/Moscow')).time()
+        self.__dict__['ВремяСоздания'] = moscow_tz.localize(datetime.datetime.now()).time()
 
 
 class FilterSection(BaseSection):

@@ -592,18 +592,19 @@ class Operation:
                     'AmountWithCommission %s as Decimal' % obj.get('amountWithCommission'))
         self.__account_number = obj.get('bankAccountNumber')
         self.__purpose = obj.get('paymentPurpose')
+        moscow_tz = pytz.timezone('Europe/Moscow')
         try:
-            self.__executed = obj.get('executed') and datetime.datetime.strptime(obj.get('executed'),
-                                                                                 '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.timezone('Europe/Moscow')) or None
+            self.__executed = obj.get('executed') and moscow_tz.localize(
+                datetime.datetime.strptime(obj.get('executed'), '%Y-%m-%dT%H:%M:%S')) or None
         except ValueError:
             raise UnexpectedValueModulbankException('Executed %s as datetime.datetime' % obj.get('executed'))
         try:
-            self.__created = obj.get('created') and datetime.datetime.strptime(obj.get('created'),
-                                                                               '%Y-%m-%dT%H:%M:%S').replace(tzinfo=pytz.timezone('Europe/Moscow')) or None
+            self.__created = obj.get('created') and moscow_tz.localize(
+                datetime.datetime.strptime(obj.get('created'), '%Y-%m-%dT%H:%M:%S')) or None
         except ValueError:
             try:
-                self.__created = obj.get('created') and datetime.datetime.strptime(obj.get('created'),
-                                                                                   '%Y-%m-%dT%H:%M:%S.%f').replace(tzinfo=pytz.timezone('Europe/Moscow')) or None
+                self.__created = obj.get('created') and moscow_tz.localize(
+                    datetime.datetime.strptime(obj.get('created'), '%Y-%m-%dT%H:%M:%S.%f')) or None
             except ValueError:
                 raise UnexpectedValueModulbankException('Created %s as datetime.datetime' % obj.get('created'))
         self.__doc_number = obj.get('docNumber')

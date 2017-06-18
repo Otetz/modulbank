@@ -1,2 +1,2 @@
 requests==2.18.1
-pytz
+pytz==2017.2
